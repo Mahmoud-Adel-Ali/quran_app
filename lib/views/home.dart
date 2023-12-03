@@ -35,13 +35,11 @@ class Home extends StatelessWidget {
               ),
             ),
 
-            // SizedBox(height: 20),
-            // ListViewChild(),
             SingleChildScrollView(
               child: Container(
                 height: MediaQuery.of(context).size.height - 222,
                 child: ListView.builder(
-                  itemCount: 20,
+                  itemCount: 8,
                   itemBuilder: (context, index) {
                     return const ListViewChild();
                   },
