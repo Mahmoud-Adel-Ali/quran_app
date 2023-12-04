@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:quran_app/constant/constant.dart';
+import 'package:quran_app/model/reader.dart';
 import 'package:quran_app/views/widgets/listViewChild.dart';
 
 class Home extends StatelessWidget {
@@ -34,14 +35,13 @@ class Home extends StatelessWidget {
                     fontWeight: FontWeight.bold),
               ),
             ),
-
             SingleChildScrollView(
               child: Container(
                 height: MediaQuery.of(context).size.height - 222,
                 child: ListView.builder(
-                  itemCount: 8,
+                  itemCount: allReader.length,
                   itemBuilder: (context, index) {
-                    return const ListViewChild();
+                    return  ListViewChild(reader: allReader[index],);
                   },
                 ),
               ),
@@ -52,3 +52,10 @@ class Home extends StatelessWidget {
     );
   }
 }
+
+List allReader = [
+  Reader(
+      name: "Islam Sobhi اسلام صبحي ",
+      img: 'assets/img/islam.jpeg',
+      content: ['سورة النمل  _ اسلام ص.mp3', 'سورة يوسف_ اسلام صبحي.mp3']),
+];

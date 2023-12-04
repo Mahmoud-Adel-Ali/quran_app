@@ -1,16 +1,28 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:quran_app/model/reader.dart';
 import 'package:quran_app/views/readerContent.dart';
 
-class ListViewChild extends StatelessWidget {
-  const ListViewChild({super.key});
+class ListViewChild extends StatefulWidget {
+  const ListViewChild({super.key, required this.reader});
+  final Reader reader;
+  
+  @override
+  State<ListViewChild> createState() => _ListViewChildState();
+}
 
+class _ListViewChildState extends State<ListViewChild> {
+  
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ReaderContent(),));
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ReaderContent(reader: widget.reader,),
+            ));
       },
       child: Container(
         height: 60,
@@ -24,11 +36,14 @@ class ListViewChild extends StatelessWidget {
           // trailing: Icon(Icons.check,color: Colors.black,),
           trailing: CircleAvatar(
             // backgroundColor: textColor,
-            backgroundImage: AssetImage('assets/img/islam.jpeg',),
+            backgroundImage: AssetImage(
+              widget.reader.img,
+            ),
           ),
-          titleAlignment:ListTileTitleAlignment.center,
+          titleAlignment: ListTileTitleAlignment.center,
           title: Text(
-            "islam sobhi   اسلام صبحي",
+              widget.reader.name,
+
             style: TextStyle(color: Colors.black, fontSize: 22),
           ),
         ),
