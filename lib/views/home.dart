@@ -57,5 +57,8 @@ List allReader = [
   Reader(
       name: "Islam Sobhi اسلام صبحي ",
       img: 'assets/img/islam.jpeg',
-      content: ['سورة النمل  _ اسلام ص.mp3', 'سورة يوسف_ اسلام صبحي.mp3']),
+      content: [
+        Item(name: "سورةالنمل" , path: 'audio/سورة النمل  _ اسلام ص.mp3'),
+        Item(name: "سوره يوسف", path: 'audio/سورة يوسف_ اسلام صبحي.mp3')
+      ]),
 ];
