@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+
 
 import 'package:flutter/material.dart';
 import 'package:quran_app/model/reader.dart';
@@ -26,7 +26,7 @@ class _ListViewChildState extends State<ListViewChild> {
       },
       child: Container(
         height: 60,
-        margin: EdgeInsets.only(bottom: 5),
+        margin: const EdgeInsets.only(bottom: 5),
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
@@ -44,7 +44,7 @@ class _ListViewChildState extends State<ListViewChild> {
           title: Text(
               widget.reader.name,
 
-            style: TextStyle(color: Colors.black, fontSize: 22),
+            style: const TextStyle(color: Colors.black, fontSize: 22),
           ),
         ),
       ),

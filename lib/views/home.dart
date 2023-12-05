@@ -36,7 +36,7 @@ class Home extends StatelessWidget {
               ),
             ),
             SingleChildScrollView(
-              child: Container(
+              child: SizedBox(
                 height: MediaQuery.of(context).size.height - 222,
                 child: ListView.builder(
                   itemCount: allReader.length,

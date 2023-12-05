@@ -18,12 +18,31 @@ class _ReaderListViewState extends State<ReaderListView> {
   bool showBottomContainer = false;
   AudioPlayer player = AudioPlayer();
   String suraNme = "";
+  Duration currentPosition = const Duration();
+  Duration lengthDuration = const Duration();
   playAudio(path) async {
     await player.play(AssetSource(path));
   }
 
   pausePlayer() async {
     await player.pause();
+  }
+
+  setUpAudio() {
+    player.onPositionChanged.listen((event) {
+      setState(() {
+        currentPosition = event;
+      });
+    });
+    player.onDurationChanged.listen((event) {
+      setState(() {
+        lengthDuration = event;
+      });
+    });
+  }
+
+  seekTo(int sec) {
+    player.seek(Duration(seconds: sec));
   }
 
   @override
@@ -45,6 +64,7 @@ class _ReaderListViewState extends State<ReaderListView> {
                     });
                     player.stop;
                     playAudio(widget.reader.content[index].path);
+                    setUpAudio();
                   },
                   child: Container(
                     alignment: Alignment.centerRight,
@@ -71,62 +91,94 @@ class _ReaderListViewState extends State<ReaderListView> {
               }),
         ),
         showBottomContainer
-            ? bottomContainer()
-            : Text(""),
+            ? Container(
+                color: const Color.fromARGB(127, 0, 0, 0),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 10),
+                    Text(
+                      suraNme,
+                      style: const TextStyle(color: textColor, fontSize: 20),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                            "${currentPosition.inMinutes.toString().padLeft(2, '0')}:${((currentPosition.inSeconds) % 60).toString().padLeft(2, '0')}"),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: Slider(
+                              activeColor: textColor,
+                              value: currentPosition.inSeconds.toDouble(),
+                              max: lengthDuration.inSeconds.toDouble(),
+                              onChanged: (value) {
+                                setState(() {
+                                  seekTo(value.toInt());
+                                });
+                              }),
+                        ),
+                        Text(
+                            "${lengthDuration.inMinutes.toString()}:${((lengthDuration.inSeconds) % 60).toString().padLeft(2, '0')}"),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        IconButton(
+                            onPressed: () {
+                              if (idx > 0) {
+                                setState(() {
+                                  idx--;
+                                  suraNme = widget.reader.content[idx].name;
+                                });
+                                player.stop;
+                                playAudio(widget.reader.content[idx].path);
+                                setUpAudio();
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.first_page,
+                              size: 33,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              setState(() {
+                                isPlay = !isPlay;
+                                if (isPlay) {
+                                  playAudio(widget.reader.content[idx].path);
+                                } else {
+                                  pausePlayer();
+                                }
+                              });
+                            },
+                            icon: Icon(
+                              isPlay ? Icons.stop : Icons.play_arrow,
+                              size: 33,
+                            )),
+                        IconButton(
+                            onPressed: () {
+                              if (idx < widget.reader.content.length) {
+                                setState(() {
+                                  idx++;
+                                  suraNme = widget.reader.content[idx].name;
+                                });
+                                player.stop;
+                                playAudio(widget.reader.content[idx].path);
+                                setUpAudio();
+                              }
+                            },
+                            icon: const Icon(
+                              Icons.last_page,
+                              size: 33,
+                            )),
+                      ],
+                    ),
+                  ],
+                ),
+              )
+            : const Text(""),
       ],
     );
-  }
-
-  Container bottomContainer() {
-    return Container(
-              color: const Color.fromARGB(127, 0, 0, 0),
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  Text(suraNme,style: TextStyle(color: textColor,fontSize: 20),),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      const Text("00:00"),
-                      Slider(value: 1.0, onChanged: (value) {}),
-                      const Text("22:10"),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.first_page,
-                            size: 33,
-                          )),
-                      IconButton(
-                          onPressed: () {
-                            setState(() {
-                              isPlay = !isPlay;
-                              if (isPlay) {
-                                playAudio(widget.reader.content[idx].path);
-                              } else {
-                                pausePlayer();
-                              }
-                            });
-                          },
-                          icon: Icon(
-                            isPlay ? Icons.play_arrow : Icons.stop,
-                            size: 33,
-                          )),
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.last_page,
-                            size: 33,
-                          )),
-                    ],
-                  ),
-                ],
-              ),
-            );
   }
 }
