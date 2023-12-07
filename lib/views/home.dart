@@ -58,7 +58,16 @@ List allReader = [
       name: "Islam Sobhi اسلام صبحي ",
       img: 'assets/img/islam.jpeg',
       content: [
-        Item(name: "سورةالنمل" , path: 'audio/سورة النمل  _ اسلام ص.mp3'),
-        Item(name: "سوره يوسف", path: 'audio/سورة يوسف_ اسلام صبحي.mp3')
+        Item(name: "سورةالنمل" , path: 'audio/islam/سورة النمل  _ اسلام ص.mp3'),
+        Item(name: "سوره يوسف", path: 'audio/islam/سورة يوسف_ اسلام صبحي.mp3'),
+        Item(name: 'سوره الكهف', path: 'audio/islam/سورة الكهف (كاملة) _ القارئ اسلام صبحي(MP3_128K).mp3'),
+        Item(name: 'سوره النجم', path: 'audio/islam/سورة النجم _ القارئ اسلام صبحي(MP3_128K).mp3'),
+        Item(name: 'سوره فصلت', path: 'audio/islam/سورة فصلت - (MP3_128K).mp3')
+      ]),
+      Reader(name: "Sherif  شريف مصطفي", img: 'assets/img/sherif.jpg', content: [
+        Item(name: 'سوره الواقعة', path:'audio/sherif/سورة الواقعة كاملة.mp3'),
+        Item(name: 'سوره طه', path: 'audio/sherif/سورة طه.mp3'),
+        Item(name: 'سوره لقمان', path: 'audio/sherif/سورة لقمان (كاملة).mp3'),
+        Item(name: 'سوره مريم', path: 'audio/sherif/سورة مريم (كاملة).mp3')
       ]),
 ];

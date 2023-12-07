@@ -158,7 +158,7 @@ class _ReaderListViewState extends State<ReaderListView> {
                             )),
                         IconButton(
                             onPressed: () {
-                              if (idx < widget.reader.content.length) {
+                              if (idx < widget.reader.content.length-1) {
                                 setState(() {
                                   idx++;
                                   suraNme = widget.reader.content[idx].name;
