@@ -1,7 +1,8 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:quran_app/constant/constant.dart';
 import 'package:quran_app/model/reader.dart';
+import 'package:quran_app/prvider/audioProvider.dart';
 
 class ReaderListView extends StatefulWidget {
   const ReaderListView({super.key, required this.reader});
@@ -13,40 +14,16 @@ class ReaderListView extends StatefulWidget {
 }
 
 class _ReaderListViewState extends State<ReaderListView> {
-  bool isPlay = false;
-  int idx = -1;
-  bool showBottomContainer = false;
-  AudioPlayer player = AudioPlayer();
-  String suraNme = "";
-  Duration currentPosition = const Duration();
-  Duration lengthDuration = const Duration();
-  playAudio(path) async {
-    await player.play(AssetSource(path));
-  }
-
-  pausePlayer() async {
-    await player.pause();
-  }
-
-  setUpAudio() {
-    player.onPositionChanged.listen((event) {
-      setState(() {
-        currentPosition = event;
-      });
-    });
-    player.onDurationChanged.listen((event) {
-      setState(() {
-        lengthDuration = event;
-      });
-    });
-  }
-
-  seekTo(int sec) {
-    player.seek(Duration(seconds: sec));
-  }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
+    final audioProvider = Provider.of<AudioProvider>(context);
+    
     return Column(
       children: [
         SizedBox(
@@ -57,14 +34,15 @@ class _ReaderListViewState extends State<ReaderListView> {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      suraNme = widget.reader.content[index].name;
-                      showBottomContainer = true;
-                      isPlay = true;
-                      idx = index;
+                      audioProvider.idx = index;
+                      audioProvider.currentAudio =
+                          widget.reader.content[index].path;
                     });
-                    player.stop;
-                    playAudio(widget.reader.content[index].path);
-                    setUpAudio();
+                    audioProvider.stopAudio();
+                    audioProvider.playAudio();
+                    audioProvider.setUpAudio(
+                        item: widget.reader.content[index], idx: index);
+                    
                   },
                   child: Container(
                     alignment: Alignment.centerRight,
@@ -90,14 +68,14 @@ class _ReaderListViewState extends State<ReaderListView> {
                 );
               }),
         ),
-        showBottomContainer
+        audioProvider.showBottomContainer
             ? Container(
                 color: const Color.fromARGB(127, 0, 0, 0),
                 child: Column(
                   children: [
                     const SizedBox(height: 10),
                     Text(
-                      suraNme,
+                      audioProvider.suraNme,
                       style: const TextStyle(color: textColor, fontSize: 20),
                     ),
                     const SizedBox(height: 10),
@@ -105,21 +83,23 @@ class _ReaderListViewState extends State<ReaderListView> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         Text(
-                            "${currentPosition.inMinutes.toString().padLeft(2, '0')}:${((currentPosition.inSeconds) % 60).toString().padLeft(2, '0')}"),
+                            "${audioProvider.currentPosition.inMinutes.toString().padLeft(2, '0')}:${((audioProvider.currentPosition.inSeconds) % 60).toString().padLeft(2, '0')}"),
                         SizedBox(
                           width: MediaQuery.of(context).size.width * 0.7,
                           child: Slider(
                               activeColor: textColor,
-                              value: currentPosition.inSeconds.toDouble(),
-                              max: lengthDuration.inSeconds.toDouble(),
+                              value: audioProvider.currentPosition.inSeconds
+                                  .toDouble(),
+                              max: audioProvider.lengthDuration.inSeconds
+                                  .toDouble(),
                               onChanged: (value) {
                                 setState(() {
-                                  seekTo(value.toInt());
+                                  audioProvider.seekTo(value.toInt());
                                 });
                               }),
                         ),
                         Text(
-                            "${lengthDuration.inMinutes.toString()}:${((lengthDuration.inSeconds) % 60).toString().padLeft(2, '0')}"),
+                            "${audioProvider.lengthDuration.inMinutes.toString()}:${((audioProvider.lengthDuration.inSeconds) % 60).toString().padLeft(2, '0')}"),
                       ],
                     ),
                     Row(
@@ -127,14 +107,22 @@ class _ReaderListViewState extends State<ReaderListView> {
                       children: [
                         IconButton(
                             onPressed: () {
-                              if (idx > 0) {
+                              if (audioProvider.idx > 0 &&
+                                  audioProvider.idx <
+                                      widget.reader.content.length) {
                                 setState(() {
-                                  idx--;
-                                  suraNme = widget.reader.content[idx].name;
+                                  audioProvider.idx--;
+                                  audioProvider.suraNme = widget
+                                      .reader.content[audioProvider.idx].name;
+                                  audioProvider.currentAudio = widget
+                                      .reader.content[audioProvider.idx].path;
                                 });
-                                player.stop;
-                                playAudio(widget.reader.content[idx].path);
-                                setUpAudio();
+                                audioProvider.player.stop;
+                                audioProvider.playAudio();
+                                audioProvider.setUpAudio(
+                                    item: widget
+                                        .reader.content[audioProvider.idx],
+                                    idx: audioProvider.idx);
                               }
                             },
                             icon: const Icon(
@@ -144,29 +132,38 @@ class _ReaderListViewState extends State<ReaderListView> {
                         IconButton(
                             onPressed: () {
                               setState(() {
-                                isPlay = !isPlay;
-                                if (isPlay) {
-                                  playAudio(widget.reader.content[idx].path);
+                                audioProvider.isPlay = !audioProvider.isPlay;
+                                if (audioProvider.isPlay) {
+                                  audioProvider.playAudio();
                                 } else {
-                                  pausePlayer();
+                                  audioProvider.pausePlayer();
                                 }
                               });
                             },
                             icon: Icon(
-                              isPlay ? Icons.stop : Icons.play_arrow,
+                              audioProvider.isPlay
+                                  ? Icons.pause
+                                  : Icons.play_arrow,
                               size: 33,
                             )),
                         IconButton(
                             onPressed: () {
-                              if (idx < widget.reader.content.length-1) {
+                              if (audioProvider.idx <
+                                  widget.reader.content.length - 1) {
                                 setState(() {
-                                  idx++;
-                                  suraNme = widget.reader.content[idx].name;
+                                  audioProvider.idx++;
+                                  audioProvider.suraNme = widget
+                                      .reader.content[audioProvider.idx].name;
+                                  audioProvider.currentAudio = widget
+                                      .reader.content[audioProvider.idx].path;
                                 });
-                                player.stop;
-                                playAudio(widget.reader.content[idx].path);
-                                setUpAudio();
-                              }
+                                audioProvider.player.stop;
+                                audioProvider.playAudio();
+                                audioProvider.setUpAudio(
+                                    item: widget
+                                        .reader.content[audioProvider.idx],
+                                    idx: audioProvider.idx);
+                                }
                             },
                             icon: const Icon(
                               Icons.last_page,
